@@ -18,9 +18,9 @@ Run this before anything else:
 "${CLAUDE_SKILL_DIR}/scripts/preflight.sh"
 ```
 
-If it exits non-zero, show the user the `FAIL` lines with their fixes, say that Capitan cannot work in this project until they are fixed and the user starts Capitan again, and STOP. Do not enter orchestration mode. Do not create the missing files yourself unless the user asks.
+If it exits non-zero, show the user the `FAIL` lines with their fixes, say that Capitan cannot work in this project until they are fixed and the user starts Capitan again, and STOP. Do not enter orchestration mode. Never apply the fixes yourself: no installs, no config files, no hook approvals. The user decides and fixes, then starts Capitan again.
 
-On success, remember the main checkout path and the default base from the output. Load the `herdr` skill if this session has it; otherwise run `herdr --skill` and read its output, which always matches the installed Herdr version. Then read the project config, if present:
+On success, remember the main checkout path and the default base from the output. This skill and its references name every Herdr and Worktrunk command Capitan needs, with the flags it depends on; use them as written. When you need a detail they do not cover, read `herdr <command> --help` or `wt <command> --help`. Then read the project config, if present:
 
 - `.claude/capitan.md` - project-specific rules. They override the defaults below section by section. If a section is missing, use the default.
 - The project's `CLAUDE.md` and `.claude/rules/` - only to learn conventions (branch names, quality gates, PR rules) that the agent prompts must reference.

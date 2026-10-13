@@ -5,7 +5,6 @@ set -uo pipefail
 
 failed=0
 ok()   { printf 'ok    %s\n' "$1"; }
-info() { printf 'info  %s\n' "$1"; }
 warn() { printf 'warn  %s\n      fix: %s\n' "$1" "$2"; }
 bad()  { printf 'FAIL  %s\n      fix: %s\n' "$1" "$2"; failed=1; }
 
@@ -27,12 +26,6 @@ if command -v herdr >/dev/null 2>&1; then
   ok "$(herdr --version 2>/dev/null)"
 else
   bad "herdr is not on PATH" "install Herdr: https://herdr.dev"
-fi
-
-if command -v jq >/dev/null 2>&1; then
-  ok "jq"
-else
-  bad "jq is not on PATH" "brew install jq (or your system's package manager)"
 fi
 
 # Worktrunk creates every worktree and runs the project's hooks in it.
@@ -89,32 +82,25 @@ fi
 if [ "$have_wt" = 1 ]; then
   # The copy must run in a blocking pre-start hook: Capitan starts the agent as
   # soon as `wt switch` returns, so a post-start copy would race it.
-  copy_hook=$(wt -C "$root" hook show --format=json 2>/dev/null \
-    | jq -r 'if any(.[]; .type == "pre-start" and (.template | test("copy-ignored"))) then "pre-start"
-             elif any(.[]; .template | test("copy-ignored")) then "other" else "none" end' 2>/dev/null)
-  case "$copy_hook" in
-    pre-start) ok "worktrunk pre-start hook copies .worktreeinclude files" ;;
-    other) bad "wt step copy-ignored runs in a background hook, so the agent could start before the files are copied" \
-             "move it to a pre-start hook in .config/wt.toml" ;;
-    *) bad "no worktrunk hook copies the .worktreeinclude files into new worktrees" \
-         "add this to .config/wt.toml and commit it:
+  if wt -C "$root" hook show pre-start 2>/dev/null | grep -q 'copy-ignored'; then
+    ok "worktrunk pre-start hook copies .worktreeinclude files"
+  elif wt -C "$root" hook show 2>/dev/null | grep -q 'copy-ignored'; then
+    bad "wt step copy-ignored runs in a background hook, so the agent could start before the files are copied" \
+      "move it to a pre-start hook in .config/wt.toml"
+  else
+    bad "no worktrunk hook copies the .worktreeinclude files into new worktrees" \
+      "add this to .config/wt.toml and commit it:
         [[pre-start]]
-        copy = \"wt step copy-ignored --require-include\"" ;;
-  esac
+        copy = \"wt step copy-ignored --require-include\""
+  fi
 
   # Project hooks run only after the user approved them; Capitan never passes --yes.
-  approval=$(wt -C "$root" config approvals list --format=json 2>/dev/null | jq -r '.state' 2>/dev/null)
-  case "$approval" in
-    approved|no_commands) ok "worktrunk project hooks approved" ;;
-    *) bad "worktrunk project hooks of this repository are not approved yet" \
-         "review and approve them: wt -C $root config approvals add" ;;
-  esac
-fi
-
-if [ -f "$root/.claude/capitan.md" ]; then
-  ok "project config: .claude/capitan.md"
-else
-  info "no .claude/capitan.md, using Capitan defaults"
+  if wt -C "$root" config approvals list --format=json 2>/dev/null | grep -Eq '"state": *"(approved|no_commands)"'; then
+    ok "worktrunk project hooks approved"
+  else
+    bad "worktrunk project hooks of this repository are not approved yet" \
+      "review and approve them: wt -C $root config approvals add"
+  fi
 fi
 
 if base=$(git -C "$root" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); then

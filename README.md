@@ -18,7 +18,6 @@ Capitan has no worktree logic of its own. It builds on [Worktrunk](https://workt
 | [Herdr](https://herdr.dev) | workspaces and agent sessions; start Claude Code inside a Herdr pane (`HERDR_ENV=1`) | see herdr.dev |
 | [Worktrunk](https://worktrunk.dev) 0.60+ | creates worktrees, runs the project's `.config/wt.toml` hooks | `brew install worktrunk` or `cargo install worktrunk` |
 | Herdr integration for Claude Code | reports each agent's state (working, blocked, idle) to Herdr; Capitan monitors with it | `herdr integration install claude` |
-| `jq` | used by the preflight | `brew install jq` |
 | `gh` | only if your tasks are GitHub issues | `brew install gh` |
 
 In the project:
@@ -32,7 +31,9 @@ In the project:
   ```
 - The project hooks approved once by you: `wt config approvals add`. Capitan never approves them for you.
 
-The preflight checks all of this and prints the exact fix for anything missing.
+Remove task worktrees through Capitan or `wt remove`, not with Herdr's own worktree remove: Herdr does not know Worktrunk, so it leaves the branch and skips your `pre-remove` and `post-remove` hooks. Closing a workspace is safe, it deletes nothing.
+
+The preflight checks all of this and prints the exact fix for anything missing. It never fixes anything itself.
 
 For your own manual work on the same worktrees inside Herdr, the [herdr-worktrunk](https://github.com/devashish2203/herdr-worktrunk) plugin gives you a Worktrunk picker. Capitan does not need it.
 
