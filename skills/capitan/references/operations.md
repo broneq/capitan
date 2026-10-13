@@ -23,7 +23,7 @@ Report a table: task, workspace, branch, agent status, worktree state (uncommitt
 
 ## Cleanup of a finished task
 
-Clean up when the agent reported `task-<slug> finished` (after the user confirmed it in the agent's pane) or when the user asks you to:
+Clean up when the agent reported `task-<slug> finished` or when the user asks you to:
 
 1. Close the task's workspace alone: `herdr workspace close <workspace_id>`. Never `--group`. After the first close in a session, check `herdr workspace list` that the other workspaces survived.
 2. Remove the worktree with Worktrunk, which also runs the project's `pre-remove` and `post-remove` hooks (for example stopping its containers): `git -C <main checkout> fetch origin`, then `wt -C <main checkout> remove --foreground <branch>`. Never `--force` or `-D`.
