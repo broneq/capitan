@@ -1,0 +1,15 @@
+{
+  "name": "capitan",
+  "private": true,
+  "description": "Capitan - Claude Code plugin: delegate every task to its own agent, git worktree and Herdr workspace",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-code": "2.1.292",
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3"
+  }
+}

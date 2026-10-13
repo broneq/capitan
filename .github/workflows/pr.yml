@@ -1,0 +1,72 @@
+name: pr
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+
+jobs:
+  # Shell scripts and the skill itself: shellcheck, then skill-check from the
+  # bdk-skill-kit release pinned below.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/checkout@v7
+        with:
+          repository: broneq/bdk
+          ref: bdk-skill-kit--v0.3.0
+          path: .skill-kit
+          sparse-checkout: plugins/bdk-skill-kit
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: shellcheck
+        run: shellcheck skills/*/scripts/*.sh
+
+      - name: skill-check
+        run: node .skill-kit/plugins/bdk-skill-kit/dist/skill-check.mjs --strict
+
+  # Strict validation of the plugin, with the Claude Code version pinned in
+  # package-lock.json.
+  plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate the plugin
+        run: npx claude plugin validate . --strict
+
+  # Every commit of the PR: release-please reads them once they reach main.
+  # PRs are rebase-merged (no merge commit repeating the PR title), so each
+  # change enters the changelog once.
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint the commits of the PR
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: npx commitlint --from "$BASE" --to "$HEAD" --verbose
