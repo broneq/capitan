@@ -4,12 +4,13 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 
 ## Layout
 
-- `.claude-plugin/plugin.json` - plugin manifest. Bump `version` on every user-visible change.
+- `.claude-plugin/plugin.json` - plugin manifest. Never edit `version` by hand: release-please owns it.
 - The plugin is listed in the `bdk` marketplace (`broneq/bdk`, `.claude-plugin/marketplace.json` on `main` and `staging/v3`), not here.
 - `skills/capitan/SKILL.md` - the orchestrator instructions. Keep it short; details go to `references/`.
 - `skills/capitan/references/` - agent prompt template, operations (monitoring, cleanup, recovery).
 - `skills/capitan/scripts/` - `preflight.sh` (project readiness) and `copy-worktreeinclude.sh`.
 - `examples/` - sample `.claude/capitan.md` and `.worktreeinclude` for user projects.
+- `.github/workflows/` - `pr.yml` (shellcheck, skill-check, strict plugin validation, commitlint) and `release.yml` (release-please, then fast-forward of the `release` branch to the release tag).
 
 ## Rules
 
@@ -19,11 +20,18 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 - `copy-worktreeinclude.sh` must keep Claude Code semantics: copy only files that match `.worktreeinclude` AND are gitignored, never overwrite.
 - Every Herdr command in the docs must exist in the current Herdr CLI (`herdr <cmd> --help`). Never document `herdr workspace close --group`, except as the forbidden trap.
 
+## Commits and releases
+
+- Every commit follows Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:` ...). release-please derives the version and `CHANGELOG.md` from them; never edit `CHANGELOG.md`, `.release-please-manifest.json` or the manifest `version` by hand.
+- Changes reach `main` only through a pull request with green checks. Merge with a merge commit or rebase, never squash: the merge commit carries no PR title (repository setting), so release-please counts each change once.
+- A release is the merge of the release PR that release-please opens. The `release` branch then points at the release tag; the `bdk` marketplace installs from it.
+
 ## Checks before commit
 
 ```bash
 shellcheck skills/capitan/scripts/*.sh
-claude plugin validate .
+node <bdk-skill-kit>/dist/skill-check.mjs --strict   # or /bdk-skill-kit:skill-check
+npx claude plugin validate . --strict
 ```
 
 Manual test: inside Herdr, in a scratch git repo with a `.worktreeinclude`, run `claude --plugin-dir <this repo>` and invoke the skill. Check the preflight failure path too (no `.worktreeinclude`, outside Herdr, from a linked worktree).
