@@ -26,7 +26,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: shellcheck
-        run: shellcheck skills/*/scripts/*.sh
+        run: shellcheck skills/*/scripts/*.sh evals/lib/*.sh evals/*/setup.sh
 
       - name: skill-check
         run: node .skill-kit/plugins/bdk-skill-kit/dist/skill-check.mjs --strict

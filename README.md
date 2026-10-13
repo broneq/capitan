@@ -1,4 +1,4 @@
-# Capitan
+ok to pytanie# Capitan
 
 A Claude Code plugin that turns your session into a captain: it does not do the work, it delegates. Every task (a code change, a report, an analysis, anything) gets its own git worktree, its own [Herdr](https://herdr.dev) workspace and its own Claude Code agent, started with exactly the settings of your session. Capitan creates them, sends the task, watches progress, and cleans up when an agent reports its task finished.
 
@@ -111,8 +111,9 @@ See [examples/capitan.md](examples/capitan.md), [examples/.worktreeinclude](exam
 
 ```bash
 npm ci
-shellcheck skills/capitan/scripts/*.sh
+shellcheck skills/capitan/scripts/*.sh evals/lib/*.sh evals/*/setup.sh
 npx claude plugin validate . --strict
+npm run eval                 # behaviour evals in evals/, about 1.30 USD per run
 claude --plugin-dir .        # inside a Herdr pane, in a test repo
 ```
 
