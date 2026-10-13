@@ -23,7 +23,7 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 ## Commits and releases
 
 - Every commit follows Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:` ...). release-please derives the version and `CHANGELOG.md` from them; never edit `CHANGELOG.md`, `.release-please-manifest.json` or the manifest `version` by hand.
-- Changes reach `main` only through a pull request with green checks. Merge with a merge commit or rebase, never squash: the merge commit carries no PR title (repository setting), so release-please counts each change once.
+- Changes reach `main` only through a pull request with green checks. The only merge method is rebase: a merge commit would repeat the PR title and release-please would list the change twice, and a squash would replace the linted commits with an unlinted PR title.
 - A release is the merge of the release PR that release-please opens. The `release` branch then points at the release tag; the `bdk` marketplace installs from it.
 
 ## Checks before commit

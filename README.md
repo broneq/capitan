@@ -38,7 +38,7 @@ First Capitan runs a preflight. If the project is not ready (not in Herdr, no `.
 1. reads it and classifies it as `Bug`, `Feature` or `Decision`,
 2. creates a worktree with `herdr worktree create` (grouped under the main checkout in Herdr),
 3. copies the `.worktreeinclude` files and runs your project setup, one setup at a time,
-4. starts an agent (`claude --model opus` by default) in the new workspace and sends it a task prompt,
+4. starts an agent (`claude` on the most capable model by default) in the new workspace and sends it a task prompt,
 5. monitors it, relays questions, and on request reports a status table of all tasks,
 6. after the PR is merged, closes the workspace and removes the worktree and branch, but only when nothing is left unpushed.
 
@@ -52,7 +52,7 @@ Capitan works with defaults. To fit a project, add `.claude/capitan.md`. Each se
 | --- | --- | --- |
 | Tasks | where tasks come from, how to claim them (assignee, board status), type mapping | GitHub issue or free text, no claiming |
 | Worktree | branch and path naming, base, setup command | `<type>/<id>-<slug>`, `../<repo>-<id>`, `origin/HEAD`, no setup |
-| Agent | agent kind and arguments | `claude --model opus` |
+| Agent | agent kind and arguments | `claude` on the most capable model |
 | Prompt | extras for the agent prompt per task type | generic Bug / Feature / Decision flow |
 | Gates | typecheck, lint, tests | taken from the project's CLAUDE.md and rules |
 | Delivery | PR rules, labels, merge policy | open a PR, never merge |
@@ -72,7 +72,10 @@ See [examples/capitan.md](examples/capitan.md) and [examples/.worktreeinclude](e
 ## Development
 
 ```bash
+npm ci
 shellcheck skills/capitan/scripts/*.sh
-claude plugin validate .
+npx claude plugin validate . --strict
 claude --plugin-dir .        # inside a Herdr pane, in a test repo
 ```
+
+The skill is also checked by `skill-check` from [bdk-skill-kit](https://github.com/broneq/bdk) (`/bdk-skill-kit:skill-check`). Commits follow Conventional Commits; releases are cut by release-please, and the marketplace installs the `release` branch.
