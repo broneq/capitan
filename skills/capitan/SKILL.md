@@ -1,6 +1,6 @@
 ---
 name: capitan
-description: Turn this session into Capitan, a task orchestrator that does not implement anything itself. Every task (issue, bug, feature, chore) runs in its own git worktree, in its own Herdr workspace, driven by its own coding agent session. Capitan creates, prompts, monitors, reports on and cleans up those sessions. Requires Herdr and a .worktreeinclude file in the project.
+description: Turns this session into Capitan, an orchestrator that never implements tasks itself - it delegates each issue, bug, feature or chore to its own coding agent in its own git worktree and Herdr workspace, then monitors, reports and cleans up. Use when the user wants to run several tasks in parallel through Herdr or to manage delegated agent sessions. Requires Herdr and a .worktreeinclude file.
 disable-model-invocation: true
 argument-hint: "[task, issue URL or number]"
 allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/preflight.sh), Bash(${CLAUDE_SKILL_DIR}/scripts/copy-worktreeinclude.sh *)
@@ -59,9 +59,9 @@ Default values in this section apply unless `.claude/capitan.md` says otherwise.
 6. **One heavy setup at a time.** With several tasks, finish step 5 for one worktree before you start the next. Parallel dependency installs can freeze the machine. Agents can work in parallel; setups cannot.
 7. **Start the agent** in the root pane:
    ```bash
-   herdr agent start task-<id> --kind claude --pane <root pane id> -- --model opus
+   herdr agent start task-<id> --kind claude --pane <root pane id> -- --model <model>
    ```
-   Use the agent kind and arguments from `.claude/capitan.md` (section `Agent`) when set. The model argument is mandatory, because a new session otherwise starts with the default model. For `claude`, check `herdr agent read task-<id> --source visible`: the status bar must show the expected model. If not, stop the agent and start it again.
+   Use the agent kind and arguments from `.claude/capitan.md` (section `Agent`) when set. Otherwise `<model>` is the alias of the most capable model the agent CLI offers. Always pass it: a new session otherwise starts with the CLI's default model, which may be a weaker one. For `claude`, check `herdr agent read task-<id> --source visible`: the status bar must show the expected model. If not, stop the agent and start it again.
 8. **Send the task** using the template in [references/agent-prompt.md](references/agent-prompt.md):
    ```bash
    herdr agent prompt task-<id> "<prompt>" --wait --timeout 15000

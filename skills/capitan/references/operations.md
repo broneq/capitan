@@ -36,4 +36,4 @@ A task is done when its PR is `MERGED` and its issue is `CLOSED` (for a free-tex
 
 - The code in the worktree stays on disk: `git -C <path> status`.
 - `herdr worktree open --cwd <main checkout> --path <worktree path> --label "<label>" --no-focus` restores the grouped workspace. Herdr usually resumes the previous agent session in it.
-- If it does not: Claude sessions live in `~/.claude/projects/<worktree path with / replaced by ->/<session-id>.jsonl`. The newest by modification time is the one. Resume it with `herdr agent start <name> --kind claude --pane <pane> -- --model opus --resume <session-id>`, then tell the agent which step to continue from.
+- If it does not: Claude sessions live in `~/.claude/projects/<worktree path with / replaced by ->/<session-id>.jsonl`. The newest by modification time is the one. Resume it with `herdr agent start <name> --kind claude --pane <pane> -- --model <model> --resume <session-id>`, then tell the agent which step to continue from.
