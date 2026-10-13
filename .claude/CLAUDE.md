@@ -20,6 +20,8 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 - Worktree creation, file copying and per-worktree setup belong to [Worktrunk](https://worktrunk.dev) and the project's `.config/wt.toml` hooks; never add copy, port or setup logic here. The copy must run in a `pre-start` hook (blocking), because Capitan starts the agent as soon as `wt switch` returns. Never pass `--yes` to `wt`: approving project hooks is the user's decision.
 - Do not add wrapper scripts around commands the agent can run directly; scripts are only for checks that need many commands (the preflight). Commands the skill runs without a prompt go to `allowed-tools`.
 - Do not depend on interactive tools (for example the herdr-worktrunk plugin, an fzf picker): Capitan must drive everything from the CLI.
+- Do not depend on other skills (for example `herdr` or `worktrunk`): the skill names every command it needs itself, with the flags it relies on, and falls back to `<tool> <command> --help`.
+- The preflight and Capitan only report what is missing and how to fix it; they never install, configure or approve anything themselves.
 - Every `wt` command and flag in the docs must exist in the current Worktrunk CLI (`wt <cmd> --help`).
 - Every Herdr command in the docs must exist in the current Herdr CLI (`herdr <cmd> --help`). Never document `herdr workspace close --group`, except as the forbidden trap.
 
