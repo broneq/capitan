@@ -23,7 +23,7 @@ task-<slug> finished: <one-line result, with links or paths>
 Decide when the task is finished:
 
 - **Clearly done**: the result needs no review by the user, for example a code change that is pushed with its pull request open. Send the message right away, do not ask.
-- **Not sure**: the result is something the user will want to read or discuss first, for example a report, an analysis or a proposal. Do not finish yet, even if you already delivered it. Show the result (a short summary and where to read it), let the user review it and answer their follow-ups. Send the message only when the user explicitly confirms that the task is finished. Ask that as its own question: "Is the task finished? The worktree will be removed." An answer to any other question, for example where to save the result, is not that confirmation.
+- **Not sure**: the result is something the user will want to read or discuss first, for example a report, an analysis or a proposal. Do not finish yet, even if you already delivered it. Show the result (a short summary and where to read it), let the user review it and answer their follow-ups. End that message with the explicit question "Is the task finished? The worktree will be removed." Do not leave it implied (for example "tell me if you want changes"): without it the user does not know the task is waiting for their decision. Send the message only when the user explicitly confirms. An answer to any other question, for example where to save the result, is not that confirmation.
 - **The user tells you to stop or finish**: ask them to confirm first, so a task is never closed by accident. Send the message only if they confirm.
 
 Never send the message for any other reason.
