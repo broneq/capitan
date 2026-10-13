@@ -1,12 +1,12 @@
 # Capitan
 
-A Claude Code plugin that turns your session into a captain: it does not write code, it delegates. Every task (issue, bug, feature, chore) gets its own git worktree, its own [Herdr](https://herdr.dev) workspace and its own agent session. Capitan creates them, sends the task, watches progress, relays the agents' questions to you, reports results and cleans up after merge.
+A Claude Code plugin that turns your session into a captain: it does not do the work, it delegates. Every task (a code change, a report, an analysis, anything) gets its own git worktree, its own [Herdr](https://herdr.dev) workspace and its own Claude Code agent, started with exactly the settings of your session. Capitan creates them, sends the task, watches progress, and cleans up when an agent reports its task finished.
 
 ```
 you ── Capitan (main checkout)
-         ├── task-123   ../shop.bugfix-123-login     Herdr workspace "123 Fix login"
-         ├── task-130   ../shop.feature-130-csv      Herdr workspace "130 Export CSV"
-         └── task-cache ../shop.chore-cache-decision Herdr workspace "cache Decide caching"
+         ├── task-login-timeout  ../shop.login-timeout   Herdr workspace "Fix login timeout"
+         ├── task-csv-export     ../shop.csv-export      Herdr workspace "Export CSV"
+         └── task-q3-report      ../shop.q3-report       Herdr workspace "Q3 usage report"
 ```
 
 ## Requirements
@@ -15,6 +15,7 @@ Capitan has no worktree logic of its own. It builds on [Worktrunk](https://workt
 
 | Tool | Why | Install |
 | --- | --- | --- |
+| Claude Code with messaging between sessions (`ListAgents`, `SendMessage`) | agents report a finished task to Capitan | - |
 | [Herdr](https://herdr.dev) | workspaces and agent sessions; start Claude Code inside a Herdr pane (`HERDR_ENV=1`) | see herdr.dev |
 | [Worktrunk](https://worktrunk.dev) 0.60+ | creates worktrees, runs the project's `.config/wt.toml` hooks | `brew install worktrunk` or `cargo install worktrunk` |
 | Herdr integration for Claude Code | reports each agent's state (working, blocked, idle) to Herdr; Capitan monitors with it | `herdr integration install claude` |
@@ -65,36 +66,36 @@ See [examples/wt.toml](examples/wt.toml) and the [Worktrunk hook docs](https://w
 
 ```
 /capitan                     # enter orchestration mode
-/capitan 123                 # enter and start issue #123 right away
-/capitan fix the flaky login test
+/capitan fix the flaky login test   # enter and start a task right away
+/capitan prepare a report of last month's errors
 ```
 
 (`/capitan:capitan` works too.)
 
-First Capitan runs a preflight. If the project is not ready (not in Herdr, Worktrunk or the Herdr integration missing, no `.worktreeinclude`, no copy hook, hooks not approved, started from a worktree) it lists what to fix and stops. Otherwise it waits for tasks. For each task it:
+First Capitan runs a preflight. If the project is not ready (not in Herdr, Worktrunk or the Herdr integration missing, no `.worktreeinclude`, no copy hook, hooks not approved, started from a worktree) it lists what to fix and stops. It never fixes anything itself. Otherwise it waits for tasks. For each task it:
 
-1. reads it and classifies it as `Bug`, `Feature` or `Decision`,
-2. creates a worktree with `wt switch --create`, which runs your `pre-start` hooks (copy, ports, installs), and opens it in Herdr grouped under the main checkout, one worktree at a time,
-3. starts an agent (`claude` on the most capable model by default) in the new workspace and sends it a task prompt,
-4. monitors it, relays questions, and on request reports a status table of all tasks,
-5. after the PR is merged, closes the workspace and runs `wt remove` (with your `pre-remove`/`post-remove` hooks), but only when nothing is left unpushed.
+1. creates a worktree with `wt switch --create`, which runs your `pre-start` hooks (copy, ports, installs), and opens it in Herdr grouped under the main checkout, one worktree at a time,
+2. starts `claude` there with your session's exact settings (same `CLAUDE_CONFIG_DIR`, launch flags, permission mode, model and effort) and sends it the task,
+3. monitors it and relays questions; you talk to the agent directly in its pane,
+4. when you confirm in the agent's pane that the task is finished (or say to finish it, and confirm), the agent messages Capitan, which closes the workspace and runs `wt remove` with your `pre-remove`/`post-remove` hooks. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
 
 Capitan never answers agents' questions for you, never approves Worktrunk hooks for you (no `--yes`), never closes workspaces it did not create and never runs `herdr workspace close --group`.
 
 ## Per-project config
 
-Capitan works with defaults. To fit a project, add `.claude/capitan.md`. Each section overrides a default:
+Capitan works with defaults. To give it extra instructions for a project, add `.claude/capitan.md`, in plain words. For example:
 
-| Section | What it controls | Default |
+| Topic | Example | Default |
 | --- | --- | --- |
-| Tasks | where tasks come from, how to claim them (assignee, board status), type mapping | GitHub issue or free text, no claiming |
-| Worktree | branch naming, base, extra setup after the Worktrunk hooks | `<type>/<id>-<slug>`, `origin/HEAD`, none |
-| Agent | agent kind and arguments | `claude` on the most capable model |
-| Prompt | extras for the agent prompt per task type | generic Bug / Feature / Decision flow |
-| Gates | typecheck, lint, tests | taken from the project's CLAUDE.md and rules |
-| Delivery | PR rules, labels, merge policy | open a PR, never merge |
-| Report | final report format (for example a Slack draft) | short summary with PR link |
-| Cleanup | extra cleanup steps | none |
+| Tasks | tasks are GitHub issues; assign them and move them on the board when started | the request as you give it |
+| Branches | `<type>/<issue>-<slug>`, base `origin/develop` | the project's convention, else `<slug>` from `origin/HEAD` |
+| Agent | a different model or extra flags | your session's settings |
+| Prompt | extras for every agent prompt | the request, the worktree context and the reporting protocol |
+| Delivery | PR rules, labels, merge policy | as the project's rules say, never merge |
+| Report | the format of the result (for example a Slack draft) | a short summary with links |
+| Status | extra columns (PR, issue, port) | agent and worktree state |
+
+Worktree setup and teardown do not belong here: they are Worktrunk hooks in `.config/wt.toml`. Quality gates come from the project's `CLAUDE.md` and rules.
 
 See [examples/capitan.md](examples/capitan.md), [examples/.worktreeinclude](examples/.worktreeinclude) and [examples/wt.toml](examples/wt.toml).
 

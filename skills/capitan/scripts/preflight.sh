@@ -54,6 +54,17 @@ if [ "$have_herdr" = 1 ]; then
   fi
 fi
 
+# Agents must start with this session's exact settings: the same Claude config
+# (also what lets them message Capitan) and the same launch flags.
+if [ -n "${CLAUDE_PID:-}" ] && launch=$(ps -o args= -p "$CLAUDE_PID" 2>/dev/null) && [ -n "$launch" ]; then
+  ok "claude launch: $launch"
+  ok "CLAUDE_CONFIG_DIR: ${CLAUDE_CONFIG_DIR:-unset (default)}"
+  ok "CLAUDE_EFFORT: ${CLAUDE_EFFORT:-unset}"
+else
+  bad "cannot read how this Claude Code session was started (CLAUDE_PID)" \
+    "run Capitan from an interactive Claude Code session"
+fi
+
 if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
   bad "not inside a git repository" "start Capitan from the project's main checkout"
   printf '\nCapitan cannot run in this project. Fix the FAIL lines and start Capitan again.\n'

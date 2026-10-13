@@ -15,6 +15,8 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 ## Rules
 
 - The skill must stay project-agnostic. Anything specific to one project (tracker IDs, ports, setup scripts, gates, merge policy, chat messages) belongs in that project's `.claude/capitan.md`, never in the skill. If you add a new override point, document it in `examples/capitan.md` and the README.
+- The workflow must not assume a task source or a deliverable: a task can be anything (code, a report, an analysis). GitHub issues, pull requests, task types and status columns belong to the project's `.claude/capitan.md`.
+- Agents start with exactly the settings of the Capitan session (`CLAUDE_CONFIG_DIR`, launch flags, model, effort): without the same config and permission mode, `SendMessage` from an agent does not reach Capitan.
 - Skill text is written in plain, imperative English. No em dash, use `-`.
 - Scripts: bash, `set -euo pipefail`, compatible with macOS bash 3.2 (no `mapfile`, no associative arrays), must pass `shellcheck`.
 - Worktree creation, file copying and per-worktree setup belong to [Worktrunk](https://worktrunk.dev) and the project's `.config/wt.toml` hooks; never add copy, port or setup logic here. The copy must run in a `pre-start` hook (blocking), because Capitan starts the agent as soon as `wt switch` returns. Never pass `--yes` to `wt`: approving project hooks is the user's decision.
@@ -39,4 +41,4 @@ node <bdk-skill-kit>/dist/skill-check.mjs --strict   # or /bdk-skill-kit:skill-c
 npx claude plugin validate . --strict
 ```
 
-Manual test: inside Herdr, in a scratch git repo with a `.worktreeinclude` and `.config/wt.toml`, run `claude --plugin-dir <this repo>` and invoke the skill. Check the preflight failure path too (no `.worktreeinclude`, no pre-start copy hook, unapproved hooks, `wt` missing, Herdr integration for claude missing, outside Herdr, from a linked worktree).
+Manual test: inside Herdr, in a scratch git repo with a `.worktreeinclude` and `.config/wt.toml`, run `claude --plugin-dir <this repo>` and invoke the skill. Give it a task, confirm the end in the agent's pane and check that the agent's `finished` message reaches Capitan and the cleanup runs. Check the preflight failure path too (no `.worktreeinclude`, no pre-start copy hook, unapproved hooks, `wt` missing, Herdr integration for claude missing, outside Herdr, from a linked worktree).
