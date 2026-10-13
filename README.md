@@ -1,4 +1,4 @@
-ok to pytanie# Capitan
+# Capitan
 
 A Claude Code plugin that turns your session into a captain: it does not do the work, it delegates. Every task (a code change, a report, an analysis, anything) gets its own git worktree, its own [Herdr](https://herdr.dev) workspace and its own Claude Code agent, started with exactly the settings of your session. Capitan creates them, sends the task, watches progress, and cleans up when an agent reports its task finished.
 
@@ -19,7 +19,6 @@ Capitan has no worktree logic of its own. It builds on [Worktrunk](https://workt
 | [Herdr](https://herdr.dev) | workspaces and agent sessions; start Claude Code inside a Herdr pane (`HERDR_ENV=1`) | see herdr.dev |
 | [Worktrunk](https://worktrunk.dev) 0.60+ | creates worktrees, runs the project's `.config/wt.toml` hooks | `brew install worktrunk` or `cargo install worktrunk` |
 | Herdr integration for Claude Code | reports each agent's state (working, blocked, idle) to Herdr; Capitan monitors with it | `herdr integration install claude` |
-| `gh` | only if your tasks are GitHub issues | `brew install gh` |
 
 In the project:
 
@@ -37,6 +36,19 @@ Remove task worktrees through Capitan or `wt remove`, not with Herdr's own workt
 The preflight checks all of this and prints the exact fix for anything missing. It never fixes anything itself.
 
 For your own manual work on the same worktrees inside Herdr, the [herdr-worktrunk](https://github.com/devashish2203/herdr-worktrunk) plugin gives you a Worktrunk picker. Capitan does not need it.
+
+## Where worktrees live
+
+Worktrunk decides, Capitan uses the path it returns. By default a worktree is a sibling of the main checkout (`../shop.login-timeout`). Change it in your Worktrunk user config, `~/.config/worktrunk/config.toml`, for all repositories or per repository (`wt config show` prints the repository's identifier). It is a personal setting, so Worktrunk ignores it in the project's `.config/wt.toml`.
+
+```toml
+# all repositories: ~/worktrees/shop/login-timeout
+worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"
+
+# one repository: inside it, at .worktrees/login-timeout (add .worktrees/ to .gitignore)
+[projects."github.com/acme/shop"]
+worktree-path = ".worktrees/{{ branch | sanitize }}"
+```
 
 ## Per-worktree environment
 
