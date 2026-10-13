@@ -9,6 +9,7 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 - `skills/capitan/SKILL.md` - the orchestrator instructions. Keep it short; details go to `references/`.
 - `skills/capitan/references/` - agent prompt template, the agent protocol (questions, delivery, when to report the task finished), operations (monitoring, cleanup, recovery).
 - `skills/capitan/scripts/preflight.sh` - project readiness check. Worktrees are created by `wt` and `herdr worktree open` commands written in `SKILL.md`, not by scripts.
+- `evals/` - `claude plugin eval` suite (see Evals below).
 - `examples/` - sample `.claude/capitan.md`, `.worktreeinclude` and `.config/wt.toml` for user projects.
 - `.github/workflows/` - `pr.yml` (shellcheck, skill-check, strict plugin validation, commitlint) and `release.yml` (release-please, then fast-forward of the `release` branch to the release tag).
 
@@ -36,9 +37,18 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 ## Checks before commit
 
 ```bash
-shellcheck skills/capitan/scripts/*.sh
+shellcheck skills/capitan/scripts/*.sh evals/lib/*.sh evals/*/setup.sh
 node <bdk-skill-kit>/dist/skill-check.mjs --strict   # or /bdk-skill-kit:skill-check
 npx claude plugin validate . --strict
 ```
 
 Manual test: inside Herdr, in a scratch git repo with a `.worktreeinclude` and `.config/wt.toml`, run `claude --plugin-dir <this repo>` and invoke the skill. Give it a clear task and an open one (a report), and check that the agent's `finished` message reaches Capitan and the cleanup runs. Check the preflight failure path too (no `.worktreeinclude`, no pre-start copy hook, unapproved hooks, `wt` missing, Herdr integration for claude missing, outside Herdr, from a linked worktree).
+
+## Evals
+
+`npm run eval` runs `evals/` with `claude plugin eval`: 4 cases x 3 runs, about 1.30 USD, a few minutes. It is not in CI (cost); run it after changing `SKILL.md` or `references/agent-protocol.md`, and before a release. Results go to `evals/results/` (gitignored).
+
+- `capitan-preflight-stops` - outside Herdr the preflight fails, and Capitan stops without doing the task or fixing anything.
+- `agent-clear-task-finishes`, `agent-report-asks-first`, `agent-finish-request-confirms` - the agent protocol: when an agent reports its task finished and when it asks first.
+
+The eval sandbox has no `SendMessage` or `AskUserQuestion`, no Herdr, and `git` fails there on macOS. The agent cases therefore replace them with stand-ins (`append_system_prompt`: a line in `../outbox.txt`, a final question) and deliver into `../shared/`. Integration (Herdr, Worktrunk, real `SendMessage`, cleanup) stays in the manual test above. When you change a grader, check that it still fails on a broken protocol, for example with the `Not sure` rule removed.

@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: agent-finish-request-confirms
+# When the user says to finish the task, the agent asks for confirmation first and does not report the task to Capitan yet.
+tags: [agent-protocol]
+execution:
+  prompt: |
+    Kończymy pracę nad tym zadaniem.
+  append_system_prompt: |
+    This environment has no SendMessage and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
+    - SendMessage: append one line `to <session name>: <message>` to the file ../outbox.txt with a single Bash command.
+    - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
+    - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
+    Do not mention these stand-ins to the user.
+  runs: 3
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Bash, Read, Write, Edit, Glob, Grep]
+context:
+  scaffold_script: setup.sh
+  history_file: history.jsonl

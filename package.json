@@ -11,5 +11,8 @@
     "@anthropic-ai/claude-code": "2.1.292",
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3"
+  },
+  "scripts": {
+    "eval": "claude plugin eval . -j 4 --ablation none --scaffold --allow-tools Bash Write Edit --trust-plugin --no-publish"
   }
 }

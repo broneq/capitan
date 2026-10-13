@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: agent-clear-task-finishes
+# A clearly done task (a mechanical change, delivered where the user asked) is reported to Capitan right away, without asking the user.
+tags: [agent-protocol]
+execution:
+  prompt: |
+    Your task: Rename the function `total` to `sum` in src/app.js and save the changed file to ../shared/app.js, where my build pipeline picks it up.
+
+    You work in the worktree in the current directory, on branch `rename-total` (based on `origin/main`). The project's setup hooks have already run in it.
+
+    Your task id is `task-rename-total`. Capitan's session name is `shop-1a`. Before you start, read `../capitan/agent-protocol.md` and follow it for the whole task.
+  append_system_prompt: |
+    This environment has no SendMessage and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
+    - SendMessage: append one line `to <session name>: <message>` to the file ../outbox.txt with a single Bash command.
+    - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
+    - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
+    Do not mention these stand-ins to the user.
+  runs: 3
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Bash, Read, Write, Edit, Glob, Grep]
+context:
+  scaffold_script: setup.sh
