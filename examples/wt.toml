@@ -1,0 +1,22 @@
+# Example of .config/wt.toml (Worktrunk project config). Commit it to your project.
+# Worktrunk runs these hooks for every worktree it creates or removes, so Capitan
+# needs no setup logic of its own. See https://worktrunk.dev for all hook types.
+# Each person approves the commands once: wt config approvals add
+
+# pre-start hooks block until done: the agent starts only after they finish.
+# Required by Capitan: copy the gitignored files listed in .worktreeinclude.
+[[pre-start]]
+copy = "wt step copy-ignored --require-include"
+
+# Optional: a stable, unique port per branch (10000-19999). The last value in a
+# dotenv file wins, so appending overrides the PORT copied from the main checkout.
+[[pre-start]]
+port = "echo PORT={{ branch | hash_port }} >> .env.local"
+
+# Optional: install dependencies before the agent starts.
+[[pre-start]]
+deps = "npm ci"
+
+# Optional: isolated docker compose stack per worktree, removed with the worktree.
+[[pre-remove]]
+compose = "docker compose -p {{ repo }}-{{ branch | sanitize }} down -v"

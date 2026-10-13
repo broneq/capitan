@@ -28,7 +28,7 @@ A task is done when its PR is `MERGED` and its issue is `CLOSED` (for a free-tex
 
 1. Verify the worktree has no local changes (`git -C <worktree> status --porcelain` is empty) and no unpushed commits (`git -C <worktree> log @{u}..HEAD` is empty). If anything is there, do not clean up; ask the user.
 2. Close its workspace alone: `herdr workspace close <workspace_id>`. Never `--group`. After the first close in a session, check `herdr workspace list` that the other workspaces survived.
-3. From the main checkout remove the worktree, then the local branch: `git worktree remove <worktree>`, then `git branch -D <branch>`. No `--force`.
+3. Remove the worktree and its branch with Worktrunk, which also runs the project's `pre-remove` and `post-remove` hooks (for example stopping its containers): `git -C <main checkout> fetch origin`, then `wt -C <main checkout> remove --foreground <branch>`. Never `--force` or `-D`. Worktrunk deletes the branch only when its content is already in the base branch; if it keeps the branch, tell the user and leave it.
 4. Run any extra cleanup from `.claude/capitan.md` (for example freeing a port or instance).
 5. If the PR is merged but the issue is still open, do not close it. Tell the user.
 
