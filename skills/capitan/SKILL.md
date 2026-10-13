@@ -67,7 +67,7 @@ Tell the user in one short line that Capitan is ready and waits for tasks. If th
    herdr agent start task-<slug> --kind claude --pane <pane id> -- <launch flags> --model <your model id> --effort <CLAUDE_EFFORT>
    ```
    `.claude/capitan.md` may override the model or add flags (section `Agent`). Check `herdr agent read task-<slug> --source visible`: the status bar must show the expected model and permission mode. If the agent is `blocked` at startup (for example a folder trust question), tell the user; do not answer it.
-5. **Send the task** using the template in [references/agent-prompt.md](references/agent-prompt.md):
+5. **Send the task** using the template in [references/agent-prompt.md](references/agent-prompt.md). The agent's rules (questions, delivery, when to report the task finished) are in [references/agent-protocol.md](references/agent-protocol.md); the prompt points the agent to that file instead of repeating it:
    ```bash
    herdr agent prompt task-<slug> "<prompt>" --wait --timeout 15000
    ```
@@ -76,7 +76,7 @@ Tell the user in one short line that Capitan is ready and waits for tasks. If th
 
 ## Messages from agents
 
-An agent sends you `task-<slug> finished: <result>` through `SendMessage` after the user confirmed in its pane that the task is finished. Then:
+An agent sends you `task-<slug> finished: <result>` through `SendMessage` when its task is finished: on its own when the task is clearly done, after the user's confirmation in its pane when it was unsure or the user told it to finish. Then:
 
 1. Relay the result to the user in a short line (with links or paths the agent gave).
 2. Clean up the task as described in [references/operations.md](references/operations.md).

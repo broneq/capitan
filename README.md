@@ -77,7 +77,7 @@ First Capitan runs a preflight. If the project is not ready (not in Herdr, Workt
 1. creates a worktree with `wt switch --create`, which runs your `pre-start` hooks (copy, ports, installs), and opens it in Herdr grouped under the main checkout, one worktree at a time,
 2. starts `claude` there with your session's exact settings (same `CLAUDE_CONFIG_DIR`, launch flags, permission mode, model and effort) and sends it the task,
 3. monitors it and relays questions; you talk to the agent directly in its pane,
-4. when you confirm in the agent's pane that the task is finished (or say to finish it, and confirm), the agent messages Capitan, which closes the workspace and runs `wt remove` with your `pre-remove`/`post-remove` hooks. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
+4. when the task is finished, the agent messages Capitan, which closes the workspace and runs `wt remove` with your `pre-remove`/`post-remove` hooks. The agent sends that message on its own when the task is clearly done; it asks you first when it is unsure (for example a report you will want to read) and when you tell it to finish, so nothing closes by accident. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
 
 Capitan never answers agents' questions for you, never approves Worktrunk hooks for you (no `--yes`), never closes workspaces it did not create and never runs `herdr workspace close --group`.
 
@@ -103,6 +103,7 @@ See [examples/capitan.md](examples/capitan.md), [examples/.worktreeinclude](exam
 
 - [skills/capitan/SKILL.md](skills/capitan/SKILL.md) - the orchestrator role and the new-task procedure.
 - [skills/capitan/references/agent-prompt.md](skills/capitan/references/agent-prompt.md) - the prompt template sent to each agent.
+- [skills/capitan/references/agent-protocol.md](skills/capitan/references/agent-protocol.md) - the rules every agent reads: questions, delivery, and when to report its task finished.
 - [skills/capitan/references/operations.md](skills/capitan/references/operations.md) - monitoring, status, cleanup, recovery.
 - [skills/capitan/scripts/preflight.sh](skills/capitan/scripts/preflight.sh) - project readiness check.
 

@@ -7,7 +7,7 @@ Claude Code plugin with one skill, `capitan`: it turns a session into an orchest
 - `.claude-plugin/plugin.json` - plugin manifest. Never edit `version` by hand: release-please owns it.
 - The plugin is listed in the `bdk` marketplace (`broneq/bdk`, `.claude-plugin/marketplace.json` on `main` and `staging/v3`), not here.
 - `skills/capitan/SKILL.md` - the orchestrator instructions. Keep it short; details go to `references/`.
-- `skills/capitan/references/` - agent prompt template, operations (monitoring, cleanup, recovery).
+- `skills/capitan/references/` - agent prompt template, the agent protocol (questions, delivery, when to report the task finished), operations (monitoring, cleanup, recovery).
 - `skills/capitan/scripts/preflight.sh` - project readiness check. Worktrees are created by `wt` and `herdr worktree open` commands written in `SKILL.md`, not by scripts.
 - `examples/` - sample `.claude/capitan.md`, `.worktreeinclude` and `.config/wt.toml` for user projects.
 - `.github/workflows/` - `pr.yml` (shellcheck, skill-check, strict plugin validation, commitlint) and `release.yml` (release-please, then fast-forward of the `release` branch to the release tag).
@@ -41,4 +41,4 @@ node <bdk-skill-kit>/dist/skill-check.mjs --strict   # or /bdk-skill-kit:skill-c
 npx claude plugin validate . --strict
 ```
 
-Manual test: inside Herdr, in a scratch git repo with a `.worktreeinclude` and `.config/wt.toml`, run `claude --plugin-dir <this repo>` and invoke the skill. Give it a task, confirm the end in the agent's pane and check that the agent's `finished` message reaches Capitan and the cleanup runs. Check the preflight failure path too (no `.worktreeinclude`, no pre-start copy hook, unapproved hooks, `wt` missing, Herdr integration for claude missing, outside Herdr, from a linked worktree).
+Manual test: inside Herdr, in a scratch git repo with a `.worktreeinclude` and `.config/wt.toml`, run `claude --plugin-dir <this repo>` and invoke the skill. Give it a clear task and an open one (a report), and check that the agent's `finished` message reaches Capitan and the cleanup runs. Check the preflight failure path too (no `.worktreeinclude`, no pre-start copy hook, unapproved hooks, `wt` missing, Herdr integration for claude missing, outside Herdr, from a linked worktree).
