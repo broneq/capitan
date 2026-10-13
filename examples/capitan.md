@@ -15,13 +15,12 @@ Plain instructions are enough: Capitan reads this file as rules, not as a strict
 ## Worktree
 
 - branch: `<bugfix|feature|chore>/<nr>-<slug>`
-- path: `~/projects/shop-<nr>`
 - base: `origin/main`
-- setup, run in the worktree after copying `.worktreeinclude`:
+- setup lives in `.config/wt.toml` (Worktrunk hooks: copy, `npm ci`, a port from `{{ branch | hash_port }}`). Extra step after it, if any:
   ```bash
-  ./scripts/setup-worktree.sh   # picks a free E2E_INSTANCE and runs npm ci
+  ./scripts/seed-dev-db.sh
   ```
-  Report the `E2E_INSTANCE` and its port (`3001 + n`) in every status table.
+- Report the dev server port (`grep ^PORT= .env.local | tail -1` in the worktree) in every status table.
 
 ## Agent
 
@@ -29,7 +28,7 @@ Plain instructions are enough: Capitan reads this file as rules, not as a strict
 
 ## Prompt
 
-- Common part: mention `E2E_INSTANCE=<n>` and the dev server port `<3001+n>`.
+- Common part: mention the dev server port from the worktree's `.env.local`.
 - Bug: E2E tests follow `.claude/rules/e2e-testing.md` and run with `scripts/run-e2e.sh`.
 - Feature: design with `/design`, plan with `/create-plan`, implement with `/execute-plan`.
 
@@ -61,4 +60,4 @@ PR: <PR URL>
 
 ## Cleanup
 
-- Nothing extra: the instance is freed when the worktree is removed.
+- Nothing extra: the `pre-remove` hook in `.config/wt.toml` stops the worktree's containers.
