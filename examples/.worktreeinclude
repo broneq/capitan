@@ -1,0 +1,5 @@
+# Gitignored files that every new worktree needs.
+# gitignore syntax. A file is copied only when it matches here AND is gitignored.
+.env.local
+.env.test.local
+config/local.json
