@@ -16,3 +16,7 @@ PR: <PR URL>
 
 :merged: will be merged automatically when pr-checks pass
 ```
+
+## Tracker
+
+Tasks are GitHub issues. Take only issues that are ready and not blocked (check `blockedBy`). At task start assign me (`gh issue edit <n> --add-assignee @me`). At close-out: if the issue is still open, close it with a comment naming the PR (`gh issue close <n> --comment "Done in <PR URL>"`), and tick the task in the epic's checklist. Agents never touch issues.
