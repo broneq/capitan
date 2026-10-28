@@ -22,7 +22,7 @@ If it exits non-zero, show the user the `FAIL` lines with their fixes, say that 
 
 On success, remember from the output:
 
-- the main checkout path and the default base,
+- the main checkout path (absolute, from the `main checkout:` line) and the default base,
 - this session's settings: the `claude launch` command, `CLAUDE_CONFIG_DIR` and `CLAUDE_EFFORT`. Every agent starts with exactly these settings (step 4).
 
 Then:
@@ -44,14 +44,14 @@ Tell the user in one short line that Capitan is ready and waits for tasks. If th
 
 ## New task
 
-1. **Name it.** Pick a short slug from the request (for example `login-timeout`). Agent name: `task-<slug>`. Workspace label: a few words of the task. Branch: the project's convention (`.claude/capitan.md`, `CLAUDE.md`, rules), otherwise `<slug>`. Base: the default base from preflight, after `git -C <main checkout> fetch origin`.
+1. **Name it.** Pick a short slug from the request (for example `login-timeout`). Agent name: `task-<slug>`. Workspace label: two to four words of the task, no `task-` prefix, no branch name (the sidebar already shows the branch). Branch: the project's convention (`.claude/capitan.md`, `CLAUDE.md`, rules), otherwise `<slug>`. Base: the default base from preflight, after `git -C <main checkout> fetch origin`.
 2. **Create the worktree** with Worktrunk. It places the worktree where the project's Worktrunk config says (by default next to the main checkout, `<repo>.<branch>`) and returns only after the project's `pre-start` hooks finished:
    ```bash
    wt -C <main checkout> switch --create <branch> --base <base> --no-cd --format=json
    ```
    Take `path` from the JSON on stdout; hook output goes to stderr. If it fails, show the user the error and stop this task. When the error says the project hooks are not approved, ask the user to review and approve them (`wt -C <main checkout> config approvals add`); never pass `--yes` yourself, approving hooks is the user's decision.
 
-   Then open it in Herdr. `--cwd` is the main checkout, so Herdr groups the new workspace under it:
+   Then open it in Herdr. `--cwd` is the main checkout, so Herdr groups the new workspace under it. Pass absolute paths only, never `.` or a relative path (also after a `cd`): Herdr stores `--cwd` as the group's repo root, and `<repo>/.` is a different group than `<repo>`.
    ```bash
    herdr worktree open --cwd <main checkout> --path <path> --label "<label>" --no-focus --json
    ```
@@ -93,5 +93,6 @@ Follow [references/operations.md](references/operations.md) for status checks, c
 - Do not close workspaces, tabs or panes that you did not create, unless the user agrees.
 - Do not kill processes by a broad pattern (`pkill -f "npm ci"`). They may belong to other worktrees. Target a specific PID.
 - Never pass `--yes` to `wt`. It would run project hooks the user has not approved.
+- Always pass absolute paths (the main checkout from preflight, the `path` from `wt`) to `--cwd`, `-C` and `--path`.
 - Always pass `--no-focus`, so you do not steal the user's focus.
 - Remove a worktree only after its agent reported the task finished or the user asked you to. Never use `--force` when removing worktrees or branches.
