@@ -89,7 +89,7 @@ First Capitan runs a preflight. If the project is not ready (not in Herdr, Workt
 1. creates a worktree with `wt switch --create`, which runs your `pre-start` hooks (copy, ports, installs), and opens it in Herdr grouped under the main checkout, one worktree at a time,
 2. starts `claude` there with your session's exact settings (same `CLAUDE_CONFIG_DIR`, launch flags, permission mode, model and effort) and sends it the task,
 3. monitors it and relays questions; you talk to the agent directly in its pane,
-4. when the task is finished, the agent messages Capitan, which closes the workspace and runs `wt remove` with your `pre-remove`/`post-remove` hooks. The agent sends that message on its own when the task is clearly done; it asks you first when it is unsure (for example a report you will want to read) and when you tell it to finish, so nothing closes by accident. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
+4. when the task is done, the agent messages Capitan. Done means the result is delivered (a pull request is merged), no questions are open and no review fixes are pending; while a pull request waits for review or checks the agent only sends a status and the workspace stays. Capitan then verifies, does the bookkeeping (closes the tracker item if still open, ticks the parent checklist; agents never set final statuses), closes the workspace, runs `wt remove` with your `pre-remove`/`post-remove` hooks, and offers the next unblocked tasks. The agent asks you first when it is unsure (for example a report you will want to read) and when you tell it to finish. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
 
 Capitan never answers agents' questions for you, never approves Worktrunk hooks for you (no `--yes`), never closes workspaces it did not create and never runs `herdr workspace close --group`.
 
@@ -99,7 +99,7 @@ Capitan works with defaults. To give it extra instructions for a project, add `.
 
 | Topic | Example | Default |
 | --- | --- | --- |
-| Tasks | tasks are GitHub issues; assign them and move them on the board when started | the request as you give it |
+| Tasks | tasks are GitHub issues; take only ready, unblocked ones; assign yourself when started; close and tick the epic at the end | the request as you give it |
 | Branches | `<type>/<issue>-<slug>`, base `origin/develop` | the project's convention, else `<slug>` from `origin/HEAD` |
 | Agent | a different model or extra flags | your session's settings |
 | Prompt | extras for every agent prompt | the request, the worktree context and the reporting protocol |
