@@ -30,6 +30,19 @@ Clean up when the agent reported `task-<slug> finished` or when the user asks yo
 3. Report what Worktrunk did. It refuses to remove a worktree with uncommitted changes, and it keeps a branch whose content is not in the base branch yet. In both cases tell the user and leave it; do not fix it yourself.
 4. Run any extra cleanup from `.claude/capitan.md`.
 
+## Tidy up
+
+When the user asks to tidy Herdr or the sidebar is cluttered, list what exists and compare:
+
+```bash
+herdr worktree list --cwd <main checkout>
+wt -C <main checkout> list
+herdr agent list
+```
+
+- A workspace without a live task (its agent is gone, its branch is merged or its worktree is removed) is a leftover. Show the user the list and close only the ones they approve, one by one, with `herdr workspace close <workspace_id>` (never `--group`), then remove its worktree as in cleanup above.
+- A workspace listed under `<main checkout>/.` or any other path than the main checkout was opened with a relative path. Close it and restore it as below with the absolute path.
+
 ## Recovery after an accidental close
 
 - The files in the worktree stay on disk: `git -C <path> status`.
