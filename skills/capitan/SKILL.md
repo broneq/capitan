@@ -75,7 +75,7 @@ Tell the user in one short line that Capitan is ready and waits for tasks. If th
    herdr agent prompt task-<slug> "<prompt>" --wait --timeout 15000
    ```
    A timeout here is NOT a failure. Check `herdr agent get task-<slug>`: `working` means the prompt arrived. Never send the same prompt twice blindly.
-6. **Claim it.** If the task has a tracker item (issue, ticket), assign the user to it now, with the tracker's CLI or tool named in `.claude/capitan.md`. Set no other status yet.
+6. **Claim it.** Right after the agent started, if the task has a tracker item (issue, ticket), do both with the commands named in `.claude/capitan.md`: assign the user, and set the item's status to the project's in-progress state. Do it yourself, agents never set statuses. If `.claude/capitan.md` names no way to set the status, ask the user once how to do it.
 7. **Report** in one line: task, workspace, branch, path, agent, status.
 
 ## Messages from agents

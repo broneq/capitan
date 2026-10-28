@@ -25,7 +25,7 @@ Report a table: task, workspace, branch, agent status, worktree state (uncommitt
 
 Run this when the agent reported `task-<slug> finished` and you verified the task is done (SKILL.md, Messages from agents), or when the user asks you to. Bookkeeping comes first, then cleanup. Skip steps that do not apply (a task without a tracker item, a report without a pull request). Use the tracker tools named in `.claude/capitan.md`.
 
-1. Close the task's tracker item if it is still open (for example a pull request without `Closes` leaves the issue open). Add a comment naming the pull request or the deliverable.
+1. Set the tracker item's final status (for example Done) and close it if it is still open (for example a pull request without `Closes` leaves the issue open). Add a comment naming the pull request or the deliverable.
 2. Tick the task in its parent checklist (for example an epic) if the project has one.
 3. Run any extra bookkeeping from `.claude/capitan.md`.
 4. Close the task's workspace alone: `herdr workspace close <workspace_id>`. Never `--group`. After the first close in a session, check `herdr workspace list` that the other workspaces survived.
