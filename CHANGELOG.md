@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/broneq/capitan/compare/v1.0.0...v1.0.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* **skill:** pass absolute paths to herdr so worktrees group under the main checkout ([7d2f8b2](https://github.com/broneq/capitan/commit/7d2f8b2880c0b4e594ca0ee3d4840578cfde0bd9))
+
 ## 1.0.0 (2026-10-13)
 
 
