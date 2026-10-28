@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/broneq/capitan/compare/v1.0.1...v1.0.2) (2026-10-28)
+
+
+### Bug Fixes
+
+* **skill:** define task done as merged and let Capitan do the bookkeeping ([5ff5f39](https://github.com/broneq/capitan/commit/5ff5f39cce56d0d15c1963341c4c488e451761a3))
+
 ## [1.0.1](https://github.com/broneq/capitan/compare/v1.0.0...v1.0.1) (2026-10-28)
 
 
