@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Scaffold for the agent protocol cases: the current directory becomes a task
-# worktree on branch $1 with an origin to push to, and Capitan's agent protocol
-# is copied next to it, where the prompt points the agent. ../shared is the
+# Scaffold for the agent cases: the current directory becomes a task worktree on
+# branch $1 with an origin to push to, and Capitan's agent rules are copied next
+# to it, where the system prompt stand-in points the agent. ../shared is the
 # user's folder for results: git cannot push inside the eval sandbox on macOS.
 set -euo pipefail
 
@@ -22,4 +22,4 @@ git push -q -u origin main
 git switch -q -c "$branch"
 
 mkdir -p ../capitan ../shared
-cp "$root/skills/capitan/references/agent-protocol.md" ../capitan/agent-protocol.md
+cp "$root/skills/capitan/references/agent-rules.md" ../capitan/agent-rules.md

@@ -10,6 +10,7 @@ execution:
     - SendMessage: append one line `to <session name>: <message>` to the file ../outbox.txt with a single Bash command.
     - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
     - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
+    Your standing rules as a task agent are in ../capitan/agent-rules.md: read it before anything else and follow it as if it were part of this system prompt.
     Do not mention these stand-ins to the user.
   runs: 3
   max_turns: 20
