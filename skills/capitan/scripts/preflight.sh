@@ -54,12 +54,34 @@ if [ "$have_herdr" = 1 ]; then
   fi
 fi
 
-# Agents must start with this session's exact settings: the same Claude config
-# (also what lets them message Capitan) and the same launch flags.
+# Agents start with this session's settings: the same Claude config and the same
+# permission mode, otherwise SendMessage between them and Capitan is held for
+# approval. Only known flags are carried over: ps joins argv with spaces, so a
+# value with spaces cannot be split back.
+rules="$(cd "$(dirname "$0")/.." && pwd)/references/agent-rules.md"
 if [ -n "${CLAUDE_PID:-}" ] && launch=$(ps -o args= -p "$CLAUDE_PID" 2>/dev/null) && [ -n "$launch" ]; then
-  ok "claude launch: $launch"
-  ok "CLAUDE_CONFIG_DIR: ${CLAUDE_CONFIG_DIR:-unset (default)}"
-  ok "CLAUDE_EFFORT: ${CLAUDE_EFFORT:-unset}"
+  flags="" dropped=""
+  # shellcheck disable=SC2086 # word splitting of the launch line is intended
+  set -- $launch
+  shift
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --permission-mode|--settings|--plugin-dir|--mcp-config|--add-dir)
+        [ $# -ge 2 ] && { flags="$flags $1 $2"; shift; } ;;
+      --permission-mode=*|--settings=*|--plugin-dir=*|--mcp-config=*|--add-dir=*|--dangerously-skip-permissions|--allow-dangerously-skip-permissions|--chrome|--no-chrome)
+        flags="$flags $1" ;;
+      --model|--effort|--resume|-r|--session-id|--name|-n|--append-system-prompt|--append-system-prompt-file|--system-prompt|--system-prompt-file)
+        [ $# -ge 2 ] && shift ;;
+      --continue|-c|--fork-session) ;;
+      -*) dropped="$dropped $1" ;;
+    esac
+    shift
+  done
+  [ -n "${CLAUDE_EFFORT:-}" ] && flags="$flags --effort $CLAUDE_EFFORT"
+  ok "agent flags:$flags --append-system-prompt-file $rules"
+  [ -n "${CLAUDE_CONFIG_DIR:-}" ] && ok "agent env: CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR"
+  [ -n "$dropped" ] && warn "these launch flags are not passed to agents:$dropped" \
+    "add them in .claude/capitan.md (section Agents) if agents need them"
 else
   bad "cannot read how this Claude Code session was started (CLAUDE_PID)" \
     "run Capitan from an interactive Claude Code session"
@@ -88,6 +110,13 @@ if [ -f "$root/.worktreeinclude" ]; then
 else
   bad ".worktreeinclude is missing in $root" \
     "create it: list the gitignored files a fresh worktree needs (for example .env.local), one gitignore-style pattern per line"
+fi
+
+# Agents read .claude/capitan.md in their own worktree.
+if [ -f "$root/.claude/capitan.md" ] && ! git -C "$root" ls-files --error-unmatch .claude/capitan.md >/dev/null 2>&1 \
+  && ! grep -qx '\.claude/capitan\.md' "$root/.worktreeinclude" 2>/dev/null; then
+  warn ".claude/capitan.md is neither committed nor listed in .worktreeinclude, so agents do not see it" \
+    "commit it, or add .claude/capitan.md to .worktreeinclude"
 fi
 
 if [ "$have_wt" = 1 ]; then
