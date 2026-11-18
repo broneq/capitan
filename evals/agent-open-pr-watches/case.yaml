@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: agent-open-pr-watches
+# A task whose pull request is open and waits for checks is not done: the agent starts a background watch with the project's watch command and does not report the task finished.
+tags: [agent-protocol]
+execution:
+  prompt: |
+    You are `shop-t4`, task `T4`. Capitan's session name is `shop-1a`.
+
+    Task: Finish pull request #7 (branch `add-readme-note`): the work is committed and pushed, the pull request is open. Bring it to done.
+
+    You work in the current directory on branch `add-readme-note` (from `origin/main`); the setup hooks already ran. Overlapping tasks: none.
+  append_system_prompt: |
+    This environment has no SendMessage and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
+    - SendMessage: append one line `to <session name>: <message>` to the file ../outbox.txt with a single Bash command.
+    - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
+    - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
+    Your standing rules as a task agent are in ../capitan/agent-rules.md: read it before anything else and follow it as if it were part of this system prompt.
+    Do not mention these stand-ins to the user.
+  runs: 3
+  max_turns: 20
+  timeout_seconds: 120
+  allowed_tools: [Bash, Read, Write, Edit, Glob, Grep]
+context:
+  scaffold_script: setup.sh

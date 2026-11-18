@@ -4,16 +4,17 @@ name: agent-report-asks-first
 tags: [agent-protocol]
 execution:
   prompt: |
-    Your task: Prepare a short report describing the files in this repository and save it as ../shared/REPORT.md.
+    You are `shop-t2`, task `T2`. Capitan's session name is `shop-1a`.
 
-    You work in the worktree in the current directory, on branch `repo-report` (based on `origin/main`). The project's setup hooks have already run in it.
+    Task: Prepare a short report describing the files in this repository and save it as ../shared/REPORT.md.
 
-    Your task id is `task-repo-report`. Capitan's session name is `shop-1a`. Before you start, read `../capitan/agent-protocol.md` and follow it for the whole task.
+    You work in the current directory on branch `repo-report` (from `origin/main`); the setup hooks already ran. Overlapping tasks: none.
   append_system_prompt: |
     This environment has no SendMessage and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
     - SendMessage: append one line `to <session name>: <message>` to the file ../outbox.txt with a single Bash command.
     - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
     - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
+    Your standing rules as a task agent are in ../capitan/agent-rules.md: read it before anything else and follow it as if it were part of this system prompt.
     Do not mention these stand-ins to the user.
   runs: 3
   max_turns: 20
