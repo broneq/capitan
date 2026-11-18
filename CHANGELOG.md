@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0](https://github.com/broneq/capitan/compare/v1.0.2...v2.0.0) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **skill:** references/agent-prompt.md, agent-protocol.md and operations.md are replaced by agent-rules.md and agent-brief.md; agents merge by default when checks are green and nothing blocks.
+
+### Features
+
+* **skill:** rewrite Capitan as a coordinator of autonomous agents ([215db03](https://github.com/broneq/capitan/commit/215db03ee78890124df01b2a3e5b3c39a3f146f8))
+
+
+### Bug Fixes
+
+* **skill:** set in-progress status when claiming a task and final status at close-out ([6677feb](https://github.com/broneq/capitan/commit/6677feb89e191bffcfa9b59c459990fe44f09f0c))
+
 ## [1.0.2](https://github.com/broneq/capitan/compare/v1.0.1...v1.0.2) (2026-10-28)
 
 
