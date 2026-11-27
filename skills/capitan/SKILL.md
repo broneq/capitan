@@ -3,7 +3,7 @@ name: capitan
 description: Turns this session into Capitan, a coordinator that opens each task (code change, report, analysis, anything) in its own Worktrunk worktree, Herdr workspace and Claude Code agent, keeps track of all running tasks, connects tasks that affect each other, and closes them out when done. Use when the user wants to run several tasks in parallel through Herdr or to manage delegated agent sessions. Requires Herdr, Worktrunk and a .worktreeinclude file.
 disable-model-invocation: true
 argument-hint: "[task]"
-allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/preflight.sh), Bash(git -C * fetch *), Bash(git -C * diff --name-only *), Bash(wt -C * switch --create *), Bash(wt -C * list *), Bash(wt -C * remove *), Bash(herdr worktree open *), Bash(herdr pane run *), Bash(herdr agent *), Bash(herdr workspace close *), Bash(herdr workspace list *)
+allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/preflight.sh), Bash(git -C * fetch *), Bash(git -C * symbolic-ref *), Bash(git -C * diff --name-only *), Bash(wt -C * switch --create *), Bash(wt -C * list *), Bash(wt -C * remove *), Bash(herdr worktree open *), Bash(herdr pane run *), Bash(herdr agent *), Bash(herdr workspace close *), Bash(herdr workspace list *)
 ---
 
 # Capitan
@@ -31,7 +31,7 @@ After a compaction (your context starts with a summary), run Start again before 
 
 ## Open a task
 
-1. Id: the tracker item's number when the task has one, otherwise `T<n>`, one higher than any `T` id in `wt list`. Agent name `<repo>-<id>` in lowercase (Herdr allows only `a-z`, `0-9`, `-`, `_`, up to 32 characters), workspace label `<id> <2-4 words>`, branch per project convention.
+1. Id: the tracker item's number when the task has one, otherwise `T<n>`, one higher than any `T` id in `wt list`. Agent name `<repo>-<id>` in lowercase (Herdr allows only `a-z`, `0-9`, `-`, `_`, up to 32 characters), workspace label `<id> <2-4 words>`, branch per project convention. Base: the project's base branch, else the default branch from `git -C <main> symbolic-ref --short refs/remotes/origin/HEAD`. Always use its remote ref (`origin/main`, not `main`): fetch does not update local branches, so a local base is stale.
 2. Overlap: compare the request with running tasks (labels, `git diff --name-only <base>...<branch>`). Warn the user, never block, and name overlapping tasks in the brief. If the tracker item is already assigned to someone else or in progress, tell the user and wait for their decision.
 3. `git -C <main> fetch --prune origin`, then `wt -C <main> switch --create <branch> --base <base> --no-cd --format=json` and take `path` from the JSON. Only Worktrunk creates worktrees: no `EnterWorktree`, no `Agent` isolation, no `herdr worktree create`, no `git worktree add`. Never pass `--yes`: if the project hooks are not approved, the user approves them.
 4. `herdr worktree open --cwd <main> --path <path> --label "<label>" --no-focus --json` and take the workspace and root pane ids from its output. Absolute paths only. Finish one setup before you start the next: parallel installs can freeze the machine.
