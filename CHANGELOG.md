@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/broneq/capitan/compare/v2.0.0...v2.0.1) (2026-11-27)
+
+
+### Bug Fixes
+
+* **skill:** let the project's merge policy decide on auto-merge ([f182e26](https://github.com/broneq/capitan/commit/f182e263e514a4206d64acd28d59b54a42362631))
+* **skill:** take Capitan's session name from ListAgents, not memory ([0185ada](https://github.com/broneq/capitan/commit/0185adafbf8dbdf0873e99a0ffb9ecd7129969bd))
+
 ## [2.0.0](https://github.com/broneq/capitan/compare/v1.0.2...v2.0.0) (2026-11-18)
 
 
