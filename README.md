@@ -104,7 +104,7 @@ Capitan works with defaults. To give it extra instructions for a project, add `.
 | --- | --- | --- |
 | Tracker | GitHub issues, Jira, anything: which items are ready, how to claim (assign, in progress) and close them | tracker items are not updated |
 | Branches | `<type>/<issue>-<slug>`, base `origin/develop` | the project's convention, else a slug from `origin/HEAD` |
-| Merge | merge method, required reviews, when agents merge | merge when all checks are green and no review requests changes; never auto-merge; no merge without checks |
+| Merge | merge method, required reviews, when agents merge | merge when all checks are green and no review requests changes; no merge without checks |
 | Watch | the command agents poll while they wait (for example `gh pr view`) | the agent writes one |
 | Agents | notes for every agent (how to present questions and results, a Slack draft), model or extra flags | your session's settings |
 
