@@ -11,7 +11,7 @@ execution:
     You work in the current directory on branch `rename-total` (from `origin/main`); the setup hooks already ran. Overlapping tasks: none.
   append_system_prompt: |
     This environment has no SendMessage and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
-    - SendMessage: append one line `to <session name>: <message>` to the file ../outbox.txt with a single Bash command.
+    - SendMessage: run `../bin/send <session name> "<message>"` with Bash.
     - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
     - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
     Your standing rules as a task agent are in ../capitan/agent-rules.md: read it before anything else and follow it as if it were part of this system prompt.

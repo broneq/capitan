@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: agent-finds-capitan
+# The brief gave a wrong Capitan name (`capitan`, the role). When the finished message cannot be delivered, the agent asks every listed session of the repo, ignores an answer that names an unlisted session, and reports to the real Capitan.
+tags: [agent-protocol]
+execution:
+  prompt: |
+    You are `shop-t1`, task `T1`. Capitan's session name is `capitan`.
+
+    Task: Rename the function `total` to `sum` in src/app.js and save the changed file to ../shared/app.js, where my build pipeline picks it up.
+
+    You work in the current directory on branch `rename-total` (from `origin/main`); the setup hooks already ran. Overlapping tasks: none.
+  append_system_prompt: |
+    This environment has no SendMessage, no ListAgents and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
+    - SendMessage: run `../bin/send <session name> "<message>"` with Bash. Its output is the delivery result, and the reply when the session answers right away.
+    - ListAgents: run `../bin/list-agents` with Bash.
+    - AskUserQuestion: end your turn with the question as your final message; the user answers in the next turn.
+    - Files outside the current directory: create them with Bash; the Write tool only reaches the current directory here.
+    Your standing rules as a task agent are in ../capitan/agent-rules.md: read it before anything else and follow it as if it were part of this system prompt.
+    Do not mention these stand-ins to the user.
+  runs: 3
+  max_turns: 25
+  timeout_seconds: 300
+  allowed_tools: [Bash, Read, Write, Edit, Glob, Grep]
+context:
+  scaffold_script: setup.sh
