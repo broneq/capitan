@@ -12,6 +12,7 @@ The tracker, its commands and status names. Capitan claims a task at start (assi
 
 GitHub issues with a Projects board. The task id is the issue number. Take only issues that are ready and not blocked (check `blockedBy`).
 
+- To create an item (when the request asks for one): `gh issue create`, then add it as a sub-issue of its epic. Bugs go under the BUGS epic (#42).
 - At start: `gh issue edit <n> --add-assignee @me`, set the Projects Status to `In progress`.
 - At the end: set Status to `Done`, close the issue if the pull request did not (`gh issue close <n> --comment "Done in <PR URL>"`), tick the task in the epic's checklist.
 
@@ -20,6 +21,12 @@ Setting the Status of a GitHub Projects v2 item (project, field and option ids a
 1. Item and project ids: `gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){issue(number:$n){projectItems(first:10){nodes{id project{id}}}}}}' -f o=<owner> -f r=<repo> -F n=<n>`.
 2. Status field and option ids: query `node(id:<project id>){... on ProjectV2{field(name:"Status"){... on ProjectV2SingleSelectField{id options{id name}}}}}`.
 3. Set it: mutation `updateProjectV2ItemFieldValue(input:{projectId:<project id>,itemId:<item id>,fieldId:<field id>,value:{singleSelectOptionId:<option id>}})`.
+
+## Mode
+
+The session's default mode, so Capitan does not ask at start: `hands-off` (agents decide themselves and ask only when they would lose work or take an irreversible step) or `hands-on` (agents ask when a wrong guess would cost real work, and confirm before closing a report). `/capitan --hands-on` or `/capitan:delegate --hands-on` still override it.
+
+hands-off
 
 ## Branches
 

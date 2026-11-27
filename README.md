@@ -77,20 +77,31 @@ See [examples/wt.toml](examples/wt.toml) and the [Worktrunk hook docs](https://w
 ## Usage
 
 ```
-/capitan                     # enter orchestration mode
-/capitan fix the flaky login test   # enter and start a task right away
-/capitan prepare a report of last month's errors
+/capitan                     # enter orchestration mode, asks for the session mode
+/capitan --hands-off fix the flaky login test   # enter and start a task right away
+/capitan:delegate https://github.com/acme/shop/issues/123 https://github.com/acme/shop/issues/124
+/capitan:delegate --hands-on prepare a report of last month's errors
+/capitan:delegate create an issue in the BUGS epic: checkout fails on empty cart
 ```
 
-(`/capitan:capitan` works too.)
+(`/capitan:capitan` works too.) In a Capitan session a plain message with a task or a link opens it too; `/capitan:delegate` adds the per-task mode. Each link or separate task becomes its own task. When the request asks for a tracker item (or `Tracker` requires one for every task), Capitan creates it first as `Tracker` says.
+
+### Modes
+
+Every task runs in one of two modes, written into the agent's brief:
+
+- `hands-on`: the agent asks when a wrong guess would cost real work or cannot be undone, and asks "Is the task finished?" before closing a report or an analysis.
+- `hands-off`: the agent decides itself, lists its decisions and assumptions in the result, and asks only when going on would lose work or take an irreversible step that neither the task nor the project's policy covers (for example a report with nowhere to deliver it). It reports `finished` as soon as the result is delivered.
+
+The session mode comes from `--hands-on`/`--hands-off` on `/capitan`, else `Mode` in `.claude/capitan.md`, else Capitan asks once. `/capitan:delegate --hands-on|--hands-off` overrides it for those tasks, and you can change a running agent's mode by telling it in its pane.
 
 First Capitan runs a preflight. If the project is not ready (not in Herdr, Worktrunk or the Herdr integration missing, no `.worktreeinclude`, no copy hook, hooks not approved, started from a worktree) it lists what to fix and stops. It never fixes anything itself. Otherwise it waits for tasks. For each task:
 
 1. Capitan gives it an id (the tracker number, or `T1`, `T2`...), warns when it overlaps a running task, and claims the tracker item (assigns you, sets it in progress) as `.claude/capitan.md` says.
-2. It creates the worktree with `wt switch --create`, which runs your `pre-start` hooks (copy, ports, installs), and opens it in Herdr under the main checkout, labelled `<id> <short title>`, one setup at a time.
+2. It creates the worktree with `wt switch --create` from the freshly fetched remote base (`origin/HEAD` unless the project names another), which runs your `pre-start` hooks (copy, ports, installs), and opens it in Herdr under the main checkout, labelled `<id> <short title>`, one setup at a time.
 3. It starts `claude` there with your session's settings (`CLAUDE_CONFIG_DIR`, permission mode, plugin dirs, model, effort) plus the agent rules in the system prompt, and sends the task.
 4. The agent works on its own. It asks you in its pane (Herdr shows which agent needs you), never Capitan. While it waits on checks, review or merge, it runs a background watch and reacts to every change. With no merge policy it merges once all checks are green and no review requests changes.
-5. When the task is done (delivered, merged if there is a pull request, nothing open) the agent sends Capitan `finished`. For a report or analysis it first asks you "Is the task finished? The worktree will be removed." Capitan verifies, closes the tracker item, closes the workspace, runs `wt remove` with your `pre-remove`/`post-remove` hooks, and offers the next tasks. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
+5. When the task is done (delivered, merged if there is a pull request, nothing open) the agent sends Capitan `finished`. In `hands-on` mode, for a report or analysis it first asks you "Is the task finished? The worktree will be removed." Capitan verifies, closes the tracker item, closes the workspace, runs `wt remove` with your `pre-remove`/`post-remove` hooks, and offers the next tasks. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
 
 If Capitan's session is resumed under a new name, it tells every running agent; an agent that cannot reach Capitan asks the repo's sessions who Capitan is, and Capitan answers with its name.
 
@@ -102,7 +113,8 @@ Capitan works with defaults. To give it extra instructions for a project, add `.
 
 | Section | Example | Default |
 | --- | --- | --- |
-| Tracker | GitHub issues, Jira, anything: which items are ready, how to claim (assign, in progress) and close them | tracker items are not updated |
+| Tracker | GitHub issues, Jira, anything: which items are ready, how to create (for example bugs under the BUGS epic), claim (assign, in progress) and close them | tracker items are not created or updated |
+| Mode | `hands-off` or `hands-on`, the session's default | Capitan asks at start |
 | Branches | `<type>/<issue>-<slug>`, base `origin/develop` | the project's convention, else a slug from `origin/HEAD` |
 | Merge | merge method, required reviews, when agents merge | merge when all checks are green and no review requests changes; no merge without checks |
 | Watch | the command agents poll while they wait (for example `gh pr view`) | the agent writes one |
@@ -117,7 +129,8 @@ See [examples/capitan.md](examples/capitan.md), [examples/.worktreeinclude](exam
 ## How it is built
 
 - [skills/capitan/SKILL.md](skills/capitan/SKILL.md) - the coordinator: principles, start, open, run, close.
-- [skills/capitan/references/agent-rules.md](skills/capitan/references/agent-rules.md) - the agents' standing rules, loaded into their system prompt: questions, merging, watching, finishing.
+- [skills/delegate/SKILL.md](skills/delegate/SKILL.md) - `/capitan:delegate`: opens tasks in a running Capitan session, with an optional mode.
+- [skills/capitan/references/agent-rules.md](skills/capitan/references/agent-rules.md) - the agents' standing rules, loaded into their system prompt: modes, questions, merging, watching, finishing.
 - [skills/capitan/references/agent-brief.md](skills/capitan/references/agent-brief.md) - the first prompt sent to each agent.
 - [skills/capitan/scripts/preflight.sh](skills/capitan/scripts/preflight.sh) - project readiness check; prints the flags agents start with.
 
