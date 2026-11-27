@@ -8,6 +8,8 @@ execution:
 
     Task: Prepare a short report describing the files in this repository and save it as ../shared/REPORT.md.
 
+    Mode: `hands-on`.
+
     You work in the current directory on branch `repo-report` (from `origin/main`); the setup hooks already ran. Overlapping tasks: none.
   append_system_prompt: |
     This environment has no SendMessage and no AskUserQuestion tool. Use these stand-ins exactly where you would use the real tools:
