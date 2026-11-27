@@ -92,7 +92,7 @@ First Capitan runs a preflight. If the project is not ready (not in Herdr, Workt
 4. The agent works on its own. It asks you in its pane (Herdr shows which agent needs you), never Capitan. While it waits on checks, review or merge, it runs a background watch and reacts to every change. With no merge policy it merges once all checks are green and no review requests changes.
 5. When the task is done (delivered, merged if there is a pull request, nothing open) the agent sends Capitan `finished`. For a report or analysis it first asks you "Is the task finished? The worktree will be removed." Capitan verifies, closes the tracker item, closes the workspace, runs `wt remove` with your `pre-remove`/`post-remove` hooks, and offers the next tasks. Worktrunk refuses to remove uncommitted work and keeps unmerged branches.
 
-If Capitan's session is resumed under a new name, it tells every running agent; an agent that cannot reach Capitan asks the other agents of the repo who Capitan is.
+If Capitan's session is resumed under a new name, it tells every running agent; an agent that cannot reach Capitan asks the repo's sessions who Capitan is, and Capitan answers with its name.
 
 Capitan never answers agents' questions for you, never approves Worktrunk hooks for you (no `--yes`), never closes workspaces it did not create and never runs `herdr workspace close --group`.
 

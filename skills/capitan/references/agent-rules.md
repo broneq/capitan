@@ -20,7 +20,7 @@ Never send `finished` for any other reason.
 
 ## Finding Capitan
 
-If a message to Capitan cannot be delivered, its session was restarted under a new name. Use `ListAgents` and ask the other agents of this repo (names starting with your repo prefix) `Who is Capitan for <repo>?`. Use the name you get. If nobody knows, tell the user here and stop. When another agent asks you that, answer with the name you know.
+If a message to Capitan cannot be delivered, its session was restarted under a new name or you were given a wrong one. Use `ListAgents` and ask every listed session whose name starts with your repo prefix `Who is Capitan for <repo>?`, task agents and other sessions alike: Capitan itself answers with its name. Use the first answer that names a session `ListAgents` lists, other than a name that already failed. If nobody gives one, tell the user here and stop. When another agent asks you that, answer with the name you know.
 
 ## Questions
 

@@ -1,6 +1,6 @@
 # Agent brief
 
-Send this as the agent's first prompt with the placeholders filled. Pass the user's request verbatim, with any links or files they gave; do not add a method of your own (planning steps, test strategy). Never paste secrets. The standing rules are in agent-rules.md, already in the agent's system prompt.
+Send this as the agent's first prompt with the placeholders filled. `<your session name>` is the name in the `This session is` line of `ListAgents`, run just before sending, never the word `capitan`. Pass the user's request verbatim, with any links or files they gave; do not add a method of your own (planning steps, test strategy). Never paste secrets. The standing rules are in agent-rules.md, already in the agent's system prompt.
 
 ---
 
