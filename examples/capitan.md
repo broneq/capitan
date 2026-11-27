@@ -27,7 +27,7 @@ Setting the Status of a GitHub Projects v2 item (project, field and option ids a
 
 ## Merge
 
-Default without this section: agents merge when all checks are green, no review requests changes and nothing is open; never with auto-merge; not at all when the repository runs no checks.
+Default without this section: agents merge when all checks are green, no review requests changes and nothing is open; not at all when the repository runs no checks.
 
 Agents merge with `gh pr merge <n> --rebase --delete-branch` (this repository allows only rebase). A review from a code owner is required. Push review fixes in one push per round.
 
