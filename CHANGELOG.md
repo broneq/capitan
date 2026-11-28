@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.0](https://github.com/broneq/capitan/compare/v2.0.1...v2.1.0) (2026-11-28)
+
+
+### Features
+
+* add /capitan:delegate to open tasks in a running Capitan session ([52829f7](https://github.com/broneq/capitan/commit/52829f7b7af24996d229b740176a6664b8ab714a))
+* **skill:** add hands-on and hands-off modes ([7803561](https://github.com/broneq/capitan/commit/7803561b2d3b3e797a3164c5af7df8ff44224180))
+
+
+### Bug Fixes
+
+* **skill:** base new worktrees on the fetched remote branch ([f6d2bbb](https://github.com/broneq/capitan/commit/f6d2bbb18a6eadfe0d2af4551298e8926f247804))
+
 ## [2.0.1](https://github.com/broneq/capitan/compare/v2.0.0...v2.0.1) (2026-11-27)
 
 
